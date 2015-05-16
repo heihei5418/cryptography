@@ -1,5 +1,5 @@
 #ifndef SHA1_H
 
-extern int SHA1(char* text, char* result);
+extern int SHA1(unsigned char* text, unsigned* result);
 
 #endif

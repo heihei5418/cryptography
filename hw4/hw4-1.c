@@ -5,6 +5,7 @@
 #include "SHA1.h"
 #include "SHA2.h"
 #include "SHA3.h"
+#include "SM3.h"
 
 int main() {
 	unsigned char input[200000];

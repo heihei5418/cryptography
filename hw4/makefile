@@ -1,6 +1,6 @@
 C=gcc
 TARGET=Hash
-SRC=hw4-1.c operation.c SHA1.c SHA2.c SHA3.c
+SRC=hw4-1.c operation.c SHA1.c SHA2.c SHA3.c SM3.c
 
 all: $(TARGET)
 

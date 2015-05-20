@@ -4,8 +4,8 @@
 #include "DES.h"
 #include "operation.h"
 
-int DES_IP_Transform(unsigned char* data) {  
-    int IP[64] = {      57, 49, 41, 33, 25, 17,  9,  1,
+int IP(unsigned char* data) {
+    int table[64] = {   57, 49, 41, 33, 25, 17,  9,  1,
                         59, 51, 43, 35, 27, 19, 11,  3,
                         61, 53, 45, 37, 29, 21, 13,  5,
                         63, 55, 47, 39, 31, 23, 15,  7,
@@ -16,13 +16,13 @@ int DES_IP_Transform(unsigned char* data) {
     int i;
     unsigned char temp[64];
     for(cnt = i; i < 64; i ++)
-        temp[i] = data[IP[i]];
+        temp[i] = data[table[i]];
     memcpy(data, temp, 64);
     return 1;
 }
 
-int DES_IPInv_Transform(unsigned char* data) {  
-    int IPInv[64] = {   39,  7, 47, 15, 55, 23, 63, 31,
+int IPInv(unsigned char* data) {
+    int table[64] = {   39,  7, 47, 15, 55, 23, 63, 31,
                         38,  6, 46, 14, 54, 22, 62, 30,
                         37,  5, 45, 13, 53, 21, 61, 29,
                         36,  4, 44, 12, 52, 20, 60, 28,
@@ -33,13 +33,13 @@ int DES_IPInv_Transform(unsigned char* data) {
     int i;
     unsigned char temp[64];
     for(i = 0; i < 64; i ++)
-        temp[i] = data[IPInv[i]];
+        temp[i] = data[table[i]];
     memcpy(data, temp, 64);
     return 1;
 }
 
-int DES_E_Transform(unsigned char* data) {  
-    int E[48] = {       31,  0,  1,  2,  3,  4,
+int E(unsigned char* data) {
+    int table[48] = {   31,  0,  1,  2,  3,  4,
                          3,  4,  5,  6,  7,  8,
                          7,  8,  9, 10, 11, 12,
                         11, 12, 13, 14, 15, 16,
@@ -50,39 +50,25 @@ int DES_E_Transform(unsigned char* data) {
     int i;
     unsigned char temp[48];
     for(i = 0; i < 48; i ++)
-        temp[i] = data[E[i]];
+        temp[i] = data[table[i]];
     memcpy(data, temp, 48);
     return 1;
 }
 
-int DES_P_Transform(unsigned char* data){  
-    int P[32] = {       15,  6, 19, 20, 28, 11, 27, 16,
+int P(unsigned char* data) {
+    int table[32] = {   15,  6, 19, 20, 28, 11, 27, 16,
                          0, 14, 22, 25,  4, 17, 30,  9,
                          1,  7, 23, 13, 31, 26,  2,  8,
                         18, 12, 29,  5, 21, 10,  3, 24};
     int i;
     unsigned char temp[32];
     for(i = 0; i < 32; i ++)
-        temp[i] = data[E[i]];
+        temp[i] = data[table[i]];
     memcpy(data, temp, 32);
     return 1;
 }
 
-int DES(unsigned char* text, unsigned* result) {
-    int PC_1[56] = {    56, 48, 40, 32, 24, 16,  8,
-                         0, 57, 49, 41, 33, 25, 17,
-                         9,  1, 58, 50, 42, 34, 26,
-                        18, 10,  2, 59, 51, 43, 35,
-                        62, 54, 46, 38, 30, 22, 14,
-                         6, 61, 53, 45, 37, 29, 21,
-                        13,  5, 60, 52, 44, 36, 28,
-                        20, 12,  4, 27, 19, 11,  3};
-    int PC_2[48] = {    13, 16, 10, 23,  0,  4,  2, 27,
-                        14,  5, 20,  9, 22, 18, 11,  3,
-                        25,  7, 15,  6, 26, 19, 12,  1,
-                        40, 51, 30, 36, 46, 54, 29, 39,
-                        50, 44, 32, 46, 43, 48, 38, 55,
-                        33, 52, 45, 41, 49, 35, 28, 31};
+int SBOX(unsigned char* data) {
     int S[8][4][16] = { // S1
                        {{14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7},
                         {0, 15, 7, 4, 14, 2, 13, 1, 10, 6, 12, 11, 9, 5, 3, 8},
@@ -123,7 +109,96 @@ int DES(unsigned char* text, unsigned* result) {
                         {1, 15, 13, 8, 10, 3, 7, 4, 12, 5, 6, 11, 0, 14, 9, 2},
                         {7, 11, 4, 1, 9, 12, 14, 2, 0, 6, 10, 13, 15, 3, 5, 8},
                         {2, 1, 14, 7, 4, 10, 8, 13, 15, 12, 9, 0, 3, 5, 6, 11}}};
-    int MOVE_TIMES[16] = {1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1};
+    int i, j;
+    for(i = 0; i < 8; i ++) {
+        unsigned char* input = data + i * 6;
+        unsigned char* output = data + i * 4;
+        int l = input[0] << 1 + input[5]; // (05)2
+        int r = input[1] << 3 + input[2] << 2 + input[3] << 1 + input[4]; // (4321)2
+        int res = S[i][l][r];
+        for(j = 0; j < 4; j ++)
+            output[j] = (res & (1 << j)) >> j;
+    }
+    return 1;
+}
+
+unsigned char* PC1(unsigned char* result, unsigned char* data) {
+    int table[56] = {   56, 48, 40, 32, 24, 16,  8,
+                         0, 57, 49, 41, 33, 25, 17,
+                         9,  1, 58, 50, 42, 34, 26,
+                        18, 10,  2, 59, 51, 43, 35,
+                        62, 54, 46, 38, 30, 22, 14,
+                         6, 61, 53, 45, 37, 29, 21,
+                        13,  5, 60, 52, 44, 36, 28,
+                        20, 12,  4, 27, 19, 11,  3};
+    int i;
+    for(i = 0; i < 56; i ++)
+        result[i] = data[table[i]];
+    return result;
+}
+
+unsigned char* PC2(unsigned char* result, unsigned char* data) {
+    int table[48] = {   13, 16, 10, 23,  0,  4,  2, 27,
+                        14,  5, 20,  9, 22, 18, 11,  3,
+                        25,  7, 15,  6, 26, 19, 12,  1,
+                        40, 51, 30, 36, 46, 54, 29, 39,
+                        50, 44, 32, 46, 43, 48, 38, 55,
+                        33, 52, 45, 41, 49, 35, 28, 31};
+    int i;
+    for(i = 0; i < 48; i ++)
+        result[i] = data[table[i]];
+    return result;
+}
+
+int make_sub_key(unsigned char* key, unsigned char** subkey) {
+    int table[16] = {1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1};
+    unsigned char buf[56], tmp[56];
+    int i;
+    PC1(buf, key);
+    for(i = 0; i < 16; i ++) {
+        memcpy(tmp, buf, table[i]);
+        memcpy(buf, buf + table[i], 56 - table[i]);
+        memcpy(buf + 56 - table[i], tmp, table[i]);
+        PC2(subkey[i], buf);
+    }
+    return 1;
+}
+
+int swap(unsigned char* left, unsigned char* right) {
+    unsigned char* temp[32];
+    memcpy(temp, left, 32);
+    memcpy(left, right, 32);
+    memcpy(right, temp, 32);
+    return 1;
+}
+
+int DES_block(unsigned char* block, unsigned char** subkey, unsigned char* result) {
+    unsigned char bits[64];
+    unsigned char right[48];
+    int i;
+    for(i = 0; i < 8; i ++)
+        byte_to_bit(bits + i * 8, block + i);
+    IP(bits);
+    for(i = 0; i < 16; i ++) {
+        memcpy(right, bits + 32, 32);
+        E(right);
+        for(j = 0; j < 48; j ++)
+            right[j] ^= subkey[i][j];
+        SBOX(right);
+        P(right);
+        for(j = 0; j < 32; j ++)
+            bits[j] ^= right[j];
+        if(i != 15)
+            swap(bits, bits + 32);
+    }
+    IPInv(bits);
+    for(i = 0; i < 8; i ++)
+        bit_to_byte(result + i, bits + i * 8);
+    return 1;
+}
+
+/* !!TODO
+int DES(unsigned char* text, unsigned* result) {
     int i, j;
 	unsigned l = strlen(text);
 	unsigned long long l_in_bits = l * 8;
@@ -153,7 +228,7 @@ int DES(unsigned char* text, unsigned* result) {
                 f = b ^ c ^ d;
                 k = 0X6ED9EBA1;
             } else if(40 <= j && j <= 59) {
-                f = (b & c) | (b & d) | (c & d); 
+                f = (b & c) | (b & d) | (c & d);
                 k = 0X8F1BBCDC;
             } else {
                 f = b ^ c ^ d;
@@ -180,35 +255,4 @@ int DES(unsigned char* text, unsigned* result) {
     result[4] = h4;
     return 1;
 }
-
-int DES_EncryptBlock(unsigned char plainBlock[8], unsigned char subKeys[16][48], unsigned char cipherBlock[8]) {  
-    unsigned char plainBits[64];  
-    unsigned char copyRight[48];  
-    int i;  
-
-    Char8ToBit64(plainBlock, plainBits);       
-    //初始置换（IP置换）  
-    DES_IP_Transform(plainBits);
-    //16轮迭代  
-    for(i = 0; i < 16; i ++){
-        memcpy(copyRight, plainBits + 32, 32);  
-        //将右半部分进行扩展置换，从32位扩展到48位  
-        DES_E_Transform(copyRight);  
-        //将右半部分与子密钥进行异或操作
-        DES_XOR(copyRight, subKeys[i], 48);
-        //异或结果进入S盒，输出32位结果  
-        DES_SBOX(copyRight);
-        //P置换  
-        DES_P_Transform(copyRight);
-        //将明文左半部分与右半部分进行异或  
-        DES_XOR(plainBits, copyRight, 32);
-        if(i != 15){  
-            //最终完成左右部的交换  
-            DES_Swap(plainBits, plainBits + 32);  
-        }
-    }  
-    //逆初始置换（IP^1置换）  
-    DES_IPInv_Transform(plainBits);
-    Bit64ToChar8(plainBits, cipherBlock);
-    return 0;  
-}  
+*/

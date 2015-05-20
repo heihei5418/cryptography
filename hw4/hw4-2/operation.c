@@ -8,6 +8,10 @@ unsigned rightrotate(unsigned x, int i) {
     return leftrotate(x, 32 - i);
 }
 
+unsigned long long rightrotate(unsigned long long x, int i) {
+    return x = (x << i) | x >> (64 - i);
+}
+
 unsigned char* longlong_to_char(unsigned char* str, unsigned long long x) {
     int i;
     for(i = 0; i < 8; i ++)
@@ -23,4 +27,21 @@ unsigned char_to_unsigned(unsigned char* str) {
         x += (unsigned)str[i];
     }
     return x;
+}
+
+unsigned char* byte_to_bit(unsigned char* bit, unsigned char* byte) {
+    int i;
+    for(i = 0; i < 8; i ++)
+        bit[i] = ((*byte) >> i) & 1;
+    return bit;
+}
+
+unsigned char* bit_to_byte(unsigned char* byte, unsigned char* bit) {
+    int i;
+    *byte = 0;
+    for(i = 0; i < 8; i ++) {
+        byte << 1;
+        byte += bit[i];
+    }
+    return byte;
 }

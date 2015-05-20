@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "SHA2.h"
+#include "SHA2_256.h"
 #include "operation.h"
 
-int SHA2(unsigned char* text, unsigned* result) {
+int SHA2_256(unsigned char* text, unsigned* result) {
     unsigned h0 = 0x6a09e667;
     unsigned h1 = 0xbb67ae85;
     unsigned h2 = 0x3c6ef372;

@@ -10,12 +10,12 @@
 #include "SM3.h"
 
 int main() {
-	unsigned char input[200000];
-    unsigned resultSHA1[5], resultSHA2_256[8], resultSHA3_256[8], resultSHA3_256[8], resultSM3[8];
+    unsigned char input[200000];
+    unsigned resultSHA1[5], resultSHA2_256[8], resultSHA3_256[8], resultSHA3_512[8], resultSM3[8];
     unsigned long long resultSHA2_512[8];
-	FILE* fp = fopen("input4-1.txt", "r");
-	FILE* fq = fopen("output4-1.txt", "w");
-	while(fgets(input, 200000, fp) != NULL) {
+    FILE* fp = fopen("input4-1.txt", "r");
+    FILE* fq = fopen("output4-1.txt", "w");
+    while(fgets(input, 200000, fp) != NULL) {
         int i;
         int l = strlen(input);
         input[l - 1] = 0;
@@ -36,7 +36,7 @@ int main() {
         fprintf(fq, "\n");
         fprintf(fq, "SHA2-512: ");
         for(i = 0; i < 8; i ++)
-            fprintf(fq, "%016x", resultSHA2_512[i]);
+            fprintf(fq, "%016llx", resultSHA2_512[i]);
         fprintf(fq, "\n");
         fprintf(fq, "SHA3-256: ");
         for(i = 0; i < 8; i ++)
@@ -50,8 +50,8 @@ int main() {
         for(i = 0; i < 8; i ++)
             fprintf(fq, "%08x", resultSM3[i]);
         fprintf(fq, "\n");
-	}
+    }
     fclose(fp);
     fclose(fq);
-	return 0;
+    return 0;
 }

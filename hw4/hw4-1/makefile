@@ -1,15 +1,11 @@
-C=gcc
-TARGET=Hash
-SRC=hw4-1.c operation.c SHA1.c SHA2.c SHA3.c SM3.c
+CC = gcc
+objects = hw4-1.o operation.o SHA1.o SHA2_256.o SHA2_512.o SHA3_256.o SHA3_512.o SM3.o
 
-all: $(TARGET)
+Hash : $(objects)
+	gcc -o Hash $(objects)
 
-$(TARGET): $(SRC:.c=.o)
-	$(C) $+ -o $@
+$(objects) : operation.h
 
--include $(SRC:.c=.d)
-
-clean:
-	$(RM) *.o *.d $(TARGET)
-
-.PHONY: all clean
+.PHONY : clean
+clean :
+	del Hash $(objects)

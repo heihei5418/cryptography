@@ -32,13 +32,18 @@ int SHA2_512(unsigned char* text, unsigned long long* result) {
     int i, j;
 	unsigned long long l = strlen(text);
 	unsigned long long l_in_bits = l * 8;
-	unsigned char* p_text = calloc(l + 65, sizeof(unsigned char));
-	unsigned chunk[64];
+	unsigned char* p_text = calloc(l + 129, sizeof(unsigned char));
+	unsigned long long chunk[80];
 	strcpy(p_text, text);
 	p_text[l] = 0x80;
-	l = (l + 9) / 64 * 64 + !!((l + 9) % 64) * 64;
+	l = (l + 17) / 128 * 128 + !!((l + 17) % 128) * 128;
     longlong_to_char(p_text + l - 8, l_in_bits);
-	for(i = 0; i < l; i += 64) {
+	/* printf("l = %lld\n", l);
+	for(i = 0; i < l; i ++)
+		printf("%02x", p_text[i]);
+	printf("\n");
+	system("pause");*/
+	for(i = 0; i < l; i += 128) {
 		unsigned long long a = h0;
 		unsigned long long b = h1;
 		unsigned long long c = h2;
@@ -48,19 +53,21 @@ int SHA2_512(unsigned char* text, unsigned long long* result) {
 		unsigned long long g = h6;
 		unsigned long long h = h7;
         for(j = 0; j < 16; j ++)
-            chunk[j] = char_to_unsigned(p_text + i + j * 4);
-        for(j = 16; j < 64; j ++) {
-            unsigned s0 = rightrotate(chunk[j - 15], 7) ^ rightrotate(chunk[j - 15], 18) ^ (chunk[j - 15] >> 3);
-            unsigned s1 = rightrotate(chunk[j - 2], 17) ^ rightrotate(chunk[j - 2], 19) ^ (chunk[j - 2] >> 10);
+            chunk[j] = char_to_longlong(p_text + i + j * 8);
+        for(j = 16; j < 80; j ++) {
+            unsigned long long s0 = rightrotate_longlong(chunk[j - 15], 1) ^ rightrotate_longlong(chunk[j - 15], 8) ^ (chunk[j - 15] >> 7);
+            unsigned long long s1 = rightrotate_longlong(chunk[j - 2], 19) ^ rightrotate_longlong(chunk[j - 2], 61) ^ (chunk[j - 2] >> 6);
             chunk[j] = chunk[j - 16] + s0 + chunk[j - 7] + s1;
         }
-        for(j = 0; j < 64; j ++) {
-            unsigned s1 =  rightrotate(e, 6) ^ rightrotate(e, 11) ^ rightrotate(e, 25);
-            unsigned ch = (e & f) ^ (~e & g);
-            unsigned temp1 = h + s1 + ch + k[j] + chunk[j];
-            unsigned s0 = rightrotate(a, 2) ^ rightrotate(a, 13) ^ rightrotate(a, 22);
-            unsigned maj = (a & b) ^ (a & c) ^ (b & c);
-            unsigned temp2 = s0 + maj;
+		for(j = 0; j < 80; j ++)
+			printf("%016llx\n", chunk[j]);
+        for(j = 0; j < 80; j ++) {
+            unsigned long long s1 =  rightrotate_longlong(e, 14) ^ rightrotate_longlong(e, 18) ^ rightrotate_longlong(e, 41);
+            unsigned long long ch = (e & f) ^ (~e & g);
+            unsigned long long temp1 = h + s1 + ch + k[j] + chunk[j];
+            unsigned long long s0 = rightrotate_longlong(a, 28) ^ rightrotate_longlong(a, 34) ^ rightrotate_longlong(a, 39);
+            unsigned long long maj = (a & b) ^ (a & c) ^ (b & c);
+            unsigned long long temp2 = s0 + maj;
             h = g;
             g = f;
             f = e;
@@ -88,5 +95,6 @@ int SHA2_512(unsigned char* text, unsigned long long* result) {
     result[5] = h5;
     result[6] = h6;
     result[7] = h7;
+	system("pause");
     return 1;
 }

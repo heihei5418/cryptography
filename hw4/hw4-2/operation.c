@@ -9,7 +9,7 @@ unsigned rightrotate(unsigned x, int i) {
 }
 
 unsigned long long rightrotate(unsigned long long x, int i) {
-    return x = (x << i) | x >> (64 - i);
+    return x = (x >> i) | x << (64 - i);
 }
 
 unsigned char* longlong_to_char(unsigned char* str, unsigned long long x) {

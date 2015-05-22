@@ -59,10 +59,10 @@ int SHA2_512(unsigned char* text, unsigned long long* result) {
             unsigned long long s1 = rightrotate_longlong(chunk[j - 2], 19) ^ rightrotate_longlong(chunk[j - 2], 61) ^ (chunk[j - 2] >> 6);
             chunk[j] = chunk[j - 16] + s0 + chunk[j - 7] + s1;
         }
-		for(j = 0; j < 80; j ++)
-			printf("%016llx\n", chunk[j]);
+		/* for(j = 0; j < 80; j ++)
+			printf("%016llx\n", chunk[j]);*/
         for(j = 0; j < 80; j ++) {
-            unsigned long long s1 =  rightrotate_longlong(e, 14) ^ rightrotate_longlong(e, 18) ^ rightrotate_longlong(e, 41);
+            unsigned long long s1 = rightrotate_longlong(e, 14) ^ rightrotate_longlong(e, 18) ^ rightrotate_longlong(e, 41);
             unsigned long long ch = (e & f) ^ (~e & g);
             unsigned long long temp1 = h + s1 + ch + k[j] + chunk[j];
             unsigned long long s0 = rightrotate_longlong(a, 28) ^ rightrotate_longlong(a, 34) ^ rightrotate_longlong(a, 39);
@@ -95,6 +95,6 @@ int SHA2_512(unsigned char* text, unsigned long long* result) {
     result[5] = h5;
     result[6] = h6;
     result[7] = h7;
-	system("pause");
+	// system("pause");
     return 1;
 }

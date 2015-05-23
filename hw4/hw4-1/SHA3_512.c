@@ -26,20 +26,26 @@ int SHA3_512(unsigned char* text, unsigned long long* result) {
     int i, l = strlen(text), x, y, k;
     unsigned char* p_text = calloc(l + 72, sizeof(unsigned char));
     strcpy(p_text, text);
-	if(!(l % 72)) {
-		p_text[l] += 0x1;
-        l += 72 - (l % 72);
-        p_text[l - 1] += 0x80;
-	}
+	p_text[l] += 0x01;
+    l += 72 - (l % 72);
+    p_text[l - 1] += 0x80;
+	for(i = 0; i < l; i ++)
+		printf("%02x", p_text[i]);
+	printf("\n");
     memset(state, 0, sizeof(state));
 	for(i = 0; i < l; i += 72) {
 		unsigned char* block = p_text + i;
         unsigned long long C[5], D[5], tmp[5][5];
         int r;
-		for(y = 0; y < 5; y ++)
-			for(x = 0; x < 5; x ++)
-				if(x + 5 * y < 9)
-					state[x][y] ^= *(unsigned long long*)(block + (x + 5 * y) * 8);
+		for(x = 0; x < 5; x ++)
+			for(y = 0; y < 5; y ++)
+				if(x * 5 + y < 9)
+					state[x][y] ^= *(unsigned long long*)(block + (x * 5 + y) * 8);
+		for(x = 0; x < 5; x ++) {
+			for(y = 0; y < 5; y ++)
+				printf("%016llx ", state[x][y]);
+			printf("\n");
+		}
         for(r = 0; r < 24; r ++) {
             for(x = 0; x < 5; x ++)
                 C[x] = state[x][0] ^ state[x][1] ^ state[x][2] ^ state[x][3] ^ state[x][4];
@@ -63,11 +69,12 @@ int SHA3_512(unsigned char* text, unsigned long long* result) {
             state[0][0] ^= RC[r];
         }
 	}
-	for(y = 0, k = 0; y < 5; y ++)
-		for(x = 0; x < 5; x ++)
-			if (x + 5 * y < 9 && k < 8) {
+	for(x = 0, k = 0; x < 5; x ++)
+		for(y = 0; y < 5; y ++)
+			if (x * 5 + y < 9 && k < 8) {
 				result[k] = state[x][y];
 				k++;
 			}
+	system("pause");
 	return 1;
 }

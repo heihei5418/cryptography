@@ -4,8 +4,8 @@
 #include "SHA3_512.h"
 #include "operation.h"
 
-int SHA3_512(unsigned char* text, unsigned long long* result) {
-	unsigned long long offset[5][5] = { { 0, 36,  3, 41, 18},
+int SHA3_512(unsigned char* text, unsigned char* result) {
+    unsigned long long offset[5][5] = { { 0, 36,  3, 41, 18},
                                         { 1, 44, 10, 45,  2},
                                         {62,  6, 43, 15, 61},
                                         {28, 55, 25, 21, 56},
@@ -26,31 +26,29 @@ int SHA3_512(unsigned char* text, unsigned long long* result) {
     int i, l = strlen(text), x, y, k;
     unsigned char* p_text = calloc(l + 72, sizeof(unsigned char));
     strcpy(p_text, text);
-	p_text[l] += 0x01;
+    p_text[l] += 0x06;
     l += 72 - (l % 72);
     p_text[l - 1] += 0x80;
-	for(i = 0; i < l; i ++)
-		printf("%02x", p_text[i]);
-	printf("\n");
+    /*for(i = 0; i < l; i ++)
+        printf("%02x", p_text[i]);
+    printf("\n");*/
     memset(state, 0, sizeof(state));
-	for(i = 0; i < l; i += 72) {
-		unsigned char* block = p_text + i;
+    for(i = 0; i < l; i += 72) {
+        unsigned char* block = p_text + i;
         unsigned long long C[5], D[5], tmp[5][5];
         int r;
-		for(x = 0; x < 5; x ++)
-			for(y = 0; y < 5; y ++)
-				if(x * 5 + y < 9)
-					state[x][y] ^= *(unsigned long long*)(block + (x * 5 + y) * 8);
-		for(x = 0; x < 5; x ++) {
-			for(y = 0; y < 5; y ++)
-				printf("%016llx ", state[x][y]);
-			printf("\n");
-		}
+        for(k = 0; k < 9; k ++)
+            state[k % 5][k / 5] = *(unsigned long long*)(block + k * 8);
+        /*for(x = 0; x < 5; x ++) {
+            for(y = 0; y < 5; y ++)
+                printf("%016llx ", state[x][y]);
+            printf("\n");
+        }*/
         for(r = 0; r < 24; r ++) {
             for(x = 0; x < 5; x ++)
                 C[x] = state[x][0] ^ state[x][1] ^ state[x][2] ^ state[x][3] ^ state[x][4];
             for(x = 0; x < 5; x ++)
-                D[x] = C[(x - 1 + 5) % 5] ^ rightrotate_longlong(C[(x + 1) % 5], 1);
+                D[x] = C[(x - 1 + 5) % 5] ^ leftrotate_longlong(C[(x + 1) % 5], 1);
             for(x = 0; x < 5; x ++)
                 for(y = 0; y < 5; y ++)
                     state[x][y] ^= D[x];
@@ -58,23 +56,30 @@ int SHA3_512(unsigned char* text, unsigned long long* result) {
              * the same as
              * for(x = 0; x < 5; x ++)
              *     for(x = 0; x < 5; x ++)
-             *         tmp[x][y] = rightrotate_longlong(state[(x + 3 * y) % 5][x], offset[(x + 3 * y) % 5][x]);
+             *         tmp[x][y] = leftrotate_longlong(state[(x + 3 * y) % 5][x], offset[(x + 3 * y) % 5][x]);
              */
             for(x = 0; x < 5; x ++)
                 for(y = 0; y < 5; y ++)
-                    tmp[y][(2 * x + 3 * y) % 5] = rightrotate_longlong(state[x][y], offset[x][y]);
+                    tmp[y][(2 * x + 3 * y) % 5] = leftrotate_longlong(state[x][y], offset[x][y]);
             for(x = 0; x < 5; x ++)
                 for(y = 0; y < 5; y ++)
                     state[x][y] = tmp[x][y] ^ (~tmp[(x + 1) % 5][y] & tmp[(x + 2) % 5][y]);
             state[0][0] ^= RC[r];
+            /* printf("Ronud %d\n", r);
+            for(x = 0; x < 5; x ++) {
+                for(y = 0; y < 5; y ++)
+                    printf("%016llx ", state[x][y]);
+                printf("\n");
+            }*/
         }
-	}
-	for(x = 0, k = 0; x < 5; x ++)
-		for(y = 0; y < 5; y ++)
-			if (x * 5 + y < 9 && k < 8) {
-				result[k] = state[x][y];
-				k++;
-			}
-	system("pause");
-	return 1;
+    }
+    /* for(x = 0; x < 5; x ++) {
+        for(y = 0; y < 5; y ++)
+            printf("%016llx ", state[x][y]);
+        printf("\n");
+    }*/
+    for(k = 0; k < 8; k ++)
+        memcpy(result + k * 8, &state[k % 5][k / 5], 8);
+    // system("pause");
+    return 1;
 }

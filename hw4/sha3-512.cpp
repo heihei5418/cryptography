@@ -217,12 +217,12 @@ void Round( vector<vector<ULL> >& S, const int& RC_index )
 
     // L step
     S[0][0] ^= RC[RC_index];
-    printf("Ronud %d\n", RC_index);
+    /* printf("Ronud %d\n", RC_index);
     for(int x = 0; x < 5; x ++) {
         for(int y = 0; y < 5; y ++)
             printf("%016llx ", S[x][y]);
         printf("\n");
-    }
+    }*/
 }
 
 void KECCAK_f( vector<vector<ULL> >& S )
@@ -248,11 +248,11 @@ string pad_message( const string& message )
     {
         if ( remaining == 8 )
         {
-            res += binary_to_char( "10000001" );
+            res += binary_to_char( "10000110" );
         }
         else
         {
-            res += binary_to_char( "00000001" );
+            res += binary_to_char( "00000110" );
             res.append( ( remaining - 16 ) / 8, '\0' );
             res += binary_to_char( "10000000" );
         }
@@ -287,11 +287,11 @@ string SHA3_512( string message )
         KECCAK_f( S );
     }
     string digest;
-    for(int x = 0; x < 5; x ++) {
+    /* for(int x = 0; x < 5; x ++) {
         for(int y = 0; y < 5; y ++)
             printf("%016llx ", S[x][y]);
         printf("\n");
-    }
+    }*/
     for ( int y = 0, k = 0; y < 5; y++ )
     {
         for ( int x = 0; x < 5; x++ )

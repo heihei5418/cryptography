@@ -150,7 +150,7 @@ unsigned char* PC2(unsigned char* result, unsigned char* data) {
     return result;
 }
 
-int make_sub_key(unsigned char* key, unsigned char** subkey) {
+int make_sub_key(unsigned char* key, unsigned char* subkey) {
     int table[16] = {1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1};
     unsigned char buf[56], tmp[56];
     int i;
@@ -159,7 +159,7 @@ int make_sub_key(unsigned char* key, unsigned char** subkey) {
         memcpy(tmp, buf, table[i]);
         memcpy(buf, buf + table[i], 56 - table[i]);
         memcpy(buf + 56 - table[i], tmp, table[i]);
-        PC2(subkey[i], buf);
+        PC2(subkey + i, buf);
     }
     return 1;
 }
@@ -172,7 +172,7 @@ int swap(unsigned char* left, unsigned char* right) {
     return 1;
 }
 
-int DES_block(unsigned char* block, unsigned char** subkey, unsigned char* result) {
+int DES_block(unsigned char* block, unsigned char* subkey, unsigned char* result) {
     unsigned char bits[64];
     unsigned char right[48];
     int i;
@@ -183,7 +183,7 @@ int DES_block(unsigned char* block, unsigned char** subkey, unsigned char* resul
         memcpy(right, bits + 32, 32);
         E(right);
         for(j = 0; j < 48; j ++)
-            right[j] ^= subkey[i][j];
+            right[j] ^= (*(subkey + i))[j];
         SBOX(right);
         P(right);
         for(j = 0; j < 32; j ++)

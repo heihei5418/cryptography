@@ -8,8 +8,12 @@ unsigned rightrotate(unsigned x, int i) {
     return leftrotate(x, 32 - i);
 }
 
+unsigned long long leftrotate_longlong(unsigned long long x, int i) {
+    return x = (x << i) | x >> (64 - i);
+}
+
 unsigned long long rightrotate_longlong(unsigned long long x, int i) {
-    return x = (x >> i) | x << (64 - i);
+    return leftrotate(x, 64 - i);
 }
 
 unsigned char* longlong_to_char(unsigned char* str, unsigned long long x) {

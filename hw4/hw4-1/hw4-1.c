@@ -11,8 +11,9 @@
 
 int main() {
     unsigned char input[200000];
-    unsigned resultSHA1[5], resultSHA2_256[8], resultSHA3_256[8], resultSHA3_512[8], resultSM3[8];
+    unsigned resultSHA1[5], resultSHA2_256[8], resultSM3[8];
     unsigned long long resultSHA2_512[8];
+    unsigned char resultSHA3_256[64], resultSHA3_512[64];
     FILE* fp = fopen("input4-1.txt", "r");
     FILE* fq = fopen("output4-1.txt", "w");
     while(fgets(input, 200000, fp) != NULL) {
@@ -39,12 +40,12 @@ int main() {
             fprintf(fq, "%016llx", resultSHA2_512[i]);
         fprintf(fq, "\n");
         fprintf(fq, "SHA3-256: ");
-        for(i = 0; i < 8; i ++)
-            fprintf(fq, "%08x", resultSHA3_256[i]);
+        for(i = 0; i < 32; i ++)
+            fprintf(fq, "%02x", resultSHA3_256[i]);
         fprintf(fq, "\n");
         fprintf(fq, "SHA3-512: ");
-        for(i = 0; i < 8; i ++)
-            fprintf(fq, "%08x", resultSHA3_512[i]);
+        for(i = 0; i < 64; i ++)
+            fprintf(fq, "%02x", resultSHA3_512[i]);
         fprintf(fq, "\n");
         fprintf(fq, "SM3: ");
         for(i = 0; i < 8; i ++)

@@ -13,7 +13,7 @@ unsigned long long leftrotate_longlong(unsigned long long x, int i) {
 }
 
 unsigned long long rightrotate_longlong(unsigned long long x, int i) {
-    return leftrotate(x, 64 - i);
+    return leftrotate_longlong(x, 64 - i);
 }
 
 unsigned char* longlong_to_char(unsigned char* str, unsigned long long x) {

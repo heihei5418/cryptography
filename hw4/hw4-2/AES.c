@@ -4,7 +4,7 @@
 #include "AES.h"
 #include "operation.h"
 
-int sub_bytes(unsigned char* state) {
+int sub_bytes(unsigned char* state, int l) {
     unsigned char table[256] = {0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
                                 0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0, 0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,
                                 0xb7, 0xfd, 0x93, 0x26, 0x36, 0x3f, 0xf7, 0xcc, 0x34, 0xa5, 0xe5, 0xf1, 0x71, 0xd8, 0x31, 0x15,
@@ -21,7 +21,8 @@ int sub_bytes(unsigned char* state) {
                                 0x70, 0x3e, 0xb5, 0x66, 0x48, 0x03, 0xf6, 0x0e, 0x61, 0x35, 0x57, 0xb9, 0x86, 0xc1, 0x1d, 0x9e,
                                 0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94, 0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf, 
                                 0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16};
-    for(i = 0; i < 16; i ++)
+    int i;
+    for(i = 0; i < l; i ++)
         state[i] = table[state[i]];
     return 1;
 }
@@ -72,46 +73,69 @@ int add_round_key(unsigned char* state, unsigned char* key) {
     return 1;
 }
 
-int key_expansion(unsigned char* key, int n, int r) {
-    int i;
-    for(i = 1; i < r; i ++) {
+int AES_key_expansion(unsigned char* subkey, unsigned char* key, int n, int m) {
+    int i, j;
+    unsigned char rc[] = {0x8d, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36};
+    memcpy(subkey, key, n);
+    for(i = n; i < m; i ++) {
+        char buf[4];
         for(j = 0; j < 4; j ++)
-            key[i * n]
-        w[i * 16 + k] = rotl(w[j]);
-        w[j] = w[j - 1] ^ w[j - 4] ^ rcon;
-        
-        for(j = 1; j < 4; j ++)
-            for(k = 0; k < 4; k ++)
-                key[i * 16 + j * 4 + k] = key[i * 16 + (j - 1) * 4 + k] ^ key[(i - 1) * 16 + j * 4 + k];
+            buf[j] = subkey[(i - 1) * 4 + j];
+        if(i % n == 0) {
+            // rotword
+            char tmp = buf[3];
+            for(j = 0; j < 2; j ++)
+                buf[j] = buf[j + 1];
+            buf[3] = tmp;
+            // subbytes
+            sub_bytes(buf, 4);
+            // addrcon
+            for(j = 0; j < 4; j ++)
+                buf[j] ^= rc[i / n];
+        } else if(n == 8 && i % n == 4) {
+            // subbytes
+            sub_bytes(buf, 4);
+        }
+        for(j = 0; j < 4; j ++)
+            subkey[i * 4 + j] = subkey[(i - n) * 4 + j] ^ buf[j];
     }
     return 1;
 }
 
-int AES_block(unsigned char* state, unsigned char* key, unsigned char* result, int , int r) {
+int AES_block(unsigned char* state, unsigned char* subkey, unsigned char* result, int r) {
     int i;
     memcpy(result, state, 16);
-    add_round_key(result, key);
+    add_round_key(result, subkey);
     for(i = 1; i <= r; i ++) {
-        sub_bytes(result);
+        sub_bytes(result, 16);
         shift_rows(result);
         if(i != r)
             mix_columns(result);
-        add_round_key(result, key + i * 16);
+        add_round_key(result, subkey + i * 16);
     }
     return 1;
 }
 
-int AES_128(unsigned char* block, unsigned char* key, unsigned char* result) {
-    key_expansion(key, 16, 11);
-    return AES_block(block, key, result, 32, 10);
+int AES_128_key_expansion(unsigned char* subkey, unsigned char* key) {
+    return AES_key_expansion(subkey, key, 16, 44);
 }
 
-int AES_192(unsigned char* block, unsigned char* key, unsigned char* result) {
-    key_expansion(key, 24, 9);
-    return AES_block(block, key, result, 48, 12);
+int AES_192_key_expansion(unsigned char* subkey, unsigned char* key) {
+    return AES_key_expansion(subkey, key, 24, 52);
 }
 
-int AES_256(unsigned char* block, unsigned char* key, unsigned char* result) {
-    key_expansion(key, 32, 8);
-    return AES_block(block, key, result, 64, 14);
+int AES_256_key_expansion(unsigned char* subkey, unsigned char* key) {
+    return AES_key_expansion(subkey, key, 32, 60);
+}
+
+int AES_128(unsigned char* block, unsigned char* subkey, unsigned char* result) {
+    return AES_block(block, subkey, result, 10);
+}
+
+int AES_192(unsigned char* block, unsigned char* subkey, unsigned char* result) {
+    return AES_block(block, subkey, result, 12);
+}
+
+int AES_256(unsigned char* block, unsigned char* subkey, unsigned char* result) {
+    return AES_block(block, subkey, result, 14);
 }

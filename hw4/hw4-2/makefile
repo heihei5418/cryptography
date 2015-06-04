@@ -1,6 +1,6 @@
 C=gcc
 TARGET=Encrypt
-SRC=hw4-2.c operation.c AES.c DES.c SM4.c
+SRC=hw4-2.c operation.c AES.c DES.c SM4.c mode.c
 
 all: $(TARGET)
 

@@ -1,15 +1,11 @@
-C=gcc
-TARGET=Encrypt
-SRC=hw4-2.c operation.c AES.c DES.c SM4.c mode.c
+CC = gcc
+objects = hw4-2.o operation.o AES.o DES.o SM4.o mode.o
 
-all: $(TARGET)
+Hash : $(objects)
+	gcc -o Encrypt $(objects)
 
-$(TARGET): $(SRC:.c=.o)
-	$(C) $+ -o $@
+$(objects) : operation.h
 
--include $(SRC:.c=.d)
-
-clean:
-	$(RM) *.o *.d $(TARGET)
-
-.PHONY: all clean
+.PHONY : clean
+clean :
+	del Encrypt $(objects)

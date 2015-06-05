@@ -47,7 +47,7 @@ int main() {
             fprintf(fq, "%02x", result[i]);
         fprintf(fq, "\n");
         
-        /*OFB(input, key, result, DES, DES_key_expansion, 8);
+        OFB(input, key, result, DES, DES_key_expansion, 8);
         fprintf(fq, "DES-OFB: ");
         for(i = 0; i < l; i ++)
             fprintf(fq, "%02x", result[i]);
@@ -105,7 +105,7 @@ int main() {
         fprintf(fq, "SM4-CTR: ");
         for(i = 0; i < l; i ++)
             fprintf(fq, "%02x", result[i]);
-        fprintf(fq, "\n");*/
+        fprintf(fq, "\n");
 	}
     fclose(fp);
     fclose(fq);

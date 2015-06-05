@@ -171,7 +171,7 @@ int DES_key_expansion(unsigned char* subkey, unsigned char* key) {
 }
 
 int swap(unsigned char* left, unsigned char* right) {
-    unsigned char* temp[32];
+    unsigned char temp[32];
     memcpy(temp, left, 32);
     memcpy(left, right, 32);
     memcpy(right, temp, 32);
@@ -204,6 +204,9 @@ int DES(unsigned char* block, unsigned char* subkey, unsigned char* result) {
         printf("%d ", bits[i]);
     printf("\n");*/
     IPInv(bits);
+	/*for(i = 0; i < 64; i ++)
+        printf("%d ", bits[i]);
+    printf("\n");*/
     for(i = 0; i < 8; i ++)
         bit_to_byte(result + i, bits + i * 8);
     return 1;

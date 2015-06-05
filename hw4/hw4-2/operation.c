@@ -61,8 +61,8 @@ unsigned char* bit_to_byte(unsigned char* byte, unsigned char* bit) {
     int i;
     *byte = 0;
     for(i = 0; i < 8; i ++) {
-        *byte << 1;
-        byte += bit[i];
+        (*byte) <<= 1;
+        (*byte) += bit[i];
     }
     return byte;
 }

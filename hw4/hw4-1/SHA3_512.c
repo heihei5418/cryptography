@@ -80,6 +80,7 @@ int SHA3_512(unsigned char* text, unsigned char* result) {
     }*/
     for(k = 0; k < 8; k ++)
         memcpy(result + k * 8, &state[k % 5][k / 5], 8);
+    free(p_text);
     // system("pause");
     return 1;
 }

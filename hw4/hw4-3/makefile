@@ -1,5 +1,5 @@
 CC = gcc
-objects = hw4-2.o operation.o AES.o DES.o SM4.o mode.o
+objects = hw4-3.o operation.o AES.o GCM.o
 
 Hash : $(objects)
 	gcc -o Encrypt $(objects)
